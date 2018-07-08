@@ -6,7 +6,11 @@ export interface IFolderModel extends Document {
     accountId : string,
     folderType:string,
     parentId?:string,
-    folders: string[]
+    folders: string[],
+    createdBy:string,
+    createdAt: Date,
+    modifiedBy:string,
+    updatedAt: Date
 }
 
 export const FolderSchema:Schema = new Schema({
@@ -27,8 +31,11 @@ export const FolderSchema:Schema = new Schema({
     folders: {
         type : Array,
         default : []
-    }
+    },
+    createdBy: String,
+    modifiedBy:String
+}, {
+    timestamps: true
 })
-
 
 export default model<IFolderModel>("Folder", FolderSchema) as Model<IFolderModel>;

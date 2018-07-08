@@ -1,8 +1,11 @@
 import * as crypto from 'crypto';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import * as mongoose from 'mongoose';
 
 import config from '../../config';
-import {ITokenData,} from '../../interfaces';
+import {ITokenData} from '../../interfaces';
 import { TEST_ACCOUNT_ID, TEST_USER_ID} from '../../utils/test.utils';
 import folderService from './folder.service';
 
@@ -20,7 +23,7 @@ describe('Folder service', () =>{
                 accountId : TEST_ACCOUNT_ID,
                 iat : 0
             };
-            rootFolderId = crypto.createHash('md5').update(`${TEST_ACCOUNT_ID}-template`).digest('hex');
+            rootFolderId = crypto.createHash('md5').update(`${userTokenData.accountId}-template`).digest('hex');
             subFolderId = crypto.createHash('md5').update(`${userTokenData.accountId}-template-${rootFolderId}-Test Sub Folder`).digest('hex');
             mongoose.connect(config.connectionStr, done);
         })
@@ -32,6 +35,10 @@ describe('Folder service', () =>{
                 expect(response[0].accountId).toEqual(TEST_ACCOUNT_ID);
                 expect(response[0].name).toEqual('My Templates');
                 expect(response[0].folders.length).toEqual(0);
+                expect(response[0].createdAt).toBeDefined();
+                expect(response[0].updatedAt).toBeDefined();
+                expect(response[0].createdBy).toEqual('testuserid');
+                expect(response[0].modifiedBy).toEqual('testuserid');
                 done();
             })
         })
@@ -43,6 +50,10 @@ describe('Folder service', () =>{
                 expect(response.folderType).toEqual('template');
                 expect(response.folders.length).toEqual(0);
                 expect(response.accountId).toEqual(TEST_ACCOUNT_ID);
+                expect(response.createdAt).toBeDefined();
+                expect(response.updatedAt).toBeDefined();
+                expect(response.createdBy).toEqual('testuserid');
+                expect(response.modifiedBy).toEqual('testuserid');
                 done();
             })
         })
@@ -57,16 +68,17 @@ describe('Folder service', () =>{
         test('it shoulde get folders', done => {
             folderService.getFolders(userTokenData, 'template').then(response => {
                 expect(response.length).toEqual(2);
+                const rootFolder = response.find(x => x.parentId === undefined);
+                expect(rootFolder._id).toEqual(rootFolderId);
+                expect(rootFolder.accountId).toEqual(TEST_ACCOUNT_ID);
+                expect(rootFolder.name).toEqual('My Templates');
+                expect(rootFolder.folders.length).toEqual(1);
 
-                expect(response[0]._id).toEqual(rootFolderId);
-                expect(response[0].accountId).toEqual(TEST_ACCOUNT_ID);
-                expect(response[0].name).toEqual('My Templates');
-                expect(response[0].folders.length).toEqual(1);
-
-                expect(response[1].accountId).toEqual(TEST_ACCOUNT_ID);
-                expect(response[1].name).toEqual('Test Sub Folder');
-                expect(response[1].folders.length).toEqual(0);
-                expect(response[1].parentId).toEqual(rootFolderId);
+                const subFolder = response.find(x => x.parentId !== undefined);
+                expect(subFolder.accountId).toEqual(TEST_ACCOUNT_ID);
+                expect(subFolder.name).toEqual('Test Sub Folder');
+                expect(subFolder.folders.length).toEqual(0);
+                expect(subFolder.parentId).toEqual(rootFolderId);
 
                 done();
             })

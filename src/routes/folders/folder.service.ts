@@ -6,14 +6,16 @@ import ITokenData from '../../interfaces/ITokenData';
 import {Folder, FolderSchema, IFolderModel} from '../../models'
 
 //#region Private Functions
-const createRootFolder = (accountId:string, folderType:string) => {
-    const id =  crypto.createHash('md5').update(`${accountId}-${folderType}`).digest('hex');
+const createRootFolder = (tokenData:ITokenData, folderType:string) => {
+    const id =  crypto.createHash('md5').update(`${tokenData.accountId}-${folderType}`).digest('hex');
     const newFolder = new Folder({
         folderType,
         _id : id,
-        accountId,
+        accountId: tokenData.accountId,
         name : folderType === 'template' ? 'My Templates' : 'My Datasheets',
-        folders : []
+        folders : [],
+        createdBy: tokenData.id,
+        modifiedBy: tokenData.id
     })
 
     return newFolder.save();
@@ -29,7 +31,7 @@ const getFolders = (tokenData:ITokenData, folderType:string):Promise<any> => {
         })
         .then(data => {
             if(data.length === 0){
-                createRootFolder(tokenData.accountId, folderType).then(folder => {
+                createRootFolder(tokenData, folderType).then(folder => {
                     resolve([folder]);
                 })
             }else{
@@ -49,7 +51,9 @@ const createFolder = (tokenData:ITokenData, name:string, parentId:string, folder
             accountId : tokenData.accountId,
             name,
             parentId,
-            folders : []
+            folders : [],
+            createdBy: tokenData.id,
+            modifiedBy: tokenData.id
         })
 
         newFolder.save().then(() => {
