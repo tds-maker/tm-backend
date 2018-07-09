@@ -1,6 +1,6 @@
 import {Response, Router} from 'express';
 import { IRequest } from '../../interfaces';
-import folderService from './folder.service';
+import folderService from './folders.service';
 
 const router = Router();
 

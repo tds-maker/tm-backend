@@ -34,7 +34,7 @@ describe('Folders route', () => {
             }, err => done());
         });
 
-        xtest('should get template folders for account', done => {
+        test('should get template folders for account', done => {
             request(app)
             .get('/folders/template')
             .set({ Authorization: `Bearer ${userToken}` })

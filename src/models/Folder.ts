@@ -1,6 +1,8 @@
-import {Document, Model, model, Schema} from 'mongoose';
+import {Model, model, Schema} from 'mongoose';
 
-export interface IFolderModel extends Document {
+import IDefaultModel from '../interfaces/IDefaultModel';
+
+export interface IFolderModel extends IDefaultModel {
     _id : string,
     name : string,
     accountId : string,
@@ -33,7 +35,7 @@ export const FolderSchema:Schema = new Schema({
         default : []
     },
     createdBy: String,
-    modifiedBy:String
+    modifiedBy:String,
 }, {
     timestamps: true
 })

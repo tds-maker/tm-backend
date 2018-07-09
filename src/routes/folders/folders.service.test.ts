@@ -7,7 +7,7 @@ import * as mongoose from 'mongoose';
 import config from '../../config';
 import {ITokenData} from '../../interfaces';
 import { TEST_ACCOUNT_ID, TEST_USER_ID} from '../../utils/test.utils';
-import folderService from './folder.service';
+import folderService from './folders.service';
 
 
 describe('Folder service', () =>{
